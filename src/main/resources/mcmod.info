@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "${modid}",
+    "name": "Vill Overlay",
+    "description": "Hypixel Bed Wars stats overlay: pulls each lobby player's star, FKDR, WLR and winstreak, ranks them, flags the sweats, shows generator timers, and gives short 'who's dangerous' commentary (heuristic + optional Claude CLI). Only active in a Bed Wars game; refreshes at most every 30s.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://github.com/TBX3D/vill-overlay",
+    "updateUrl": "",
+    "authorList": [
+      "billypwns + claude"
+    ],
+    "credits": "Built on nea89o's public-domain Forge 1.8.9 template. Bedwars star formula + stat field paths verified against Amund211/prism.",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
