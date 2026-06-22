@@ -33,11 +33,15 @@ public final class Commentary {
         BwStats easy = null;
         int sweats = 0;
         int nicks = 0;
+        int flagged = 0;
         int counted = 0;
         double sumFkdr = 0;
         for (BwStats s : sorted) {
             if (s.loading || s.error != null) {
                 continue;
+            }
+            if (s.flagged) {
+                flagged++;
             }
             if (s.nicked) {
                 nicks++;
@@ -72,6 +76,9 @@ public final class Commentary {
         }
         if (nicks > 0) {
             sb.append(" §8| §d").append(nicks).append(" nick").append(nicks == 1 ? "" : "s");
+        }
+        if (flagged > 0) {
+            sb.append(" §8| §4").append(flagged).append(" blacklisted");
         }
         return sb.toString();
     }
@@ -124,8 +131,11 @@ public final class Commentary {
                 sb.append(": ").append(s.star).append(" star, ")
                         .append(fmt(s.fkdr)).append(" FKDR, ")
                         .append(fmt(s.wlr)).append(" WLR, ")
-                        .append(s.winstreakKnown ? s.winstreak + " ws" : "ws hidden")
-                        .append("\n");
+                        .append(s.winstreakKnown ? s.winstreak + " ws" : "ws hidden");
+                if (s.flagged) {
+                    sb.append(" [BLACKLISTED").append(s.flagLabel != null ? ": " + s.flagLabel : "").append("]");
+                }
+                sb.append("\n");
             }
         }
         return sb.toString();

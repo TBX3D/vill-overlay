@@ -97,6 +97,15 @@ public final class StatsService {
         }
     }
 
+    /** Tag a finished stat line if its uuid is on the shared blacklist (no-op when off). */
+    private static BwStats applyFlag(BwStats s) {
+        if (s == null || s.uuid == null || s.nicked || s.loading || s.error != null) {
+            return s;
+        }
+        Blacklist.Result r = Blacklist.resolve(s.uuid);
+        return r != null ? s.withFlag(r.label) : s;
+    }
+
     private void fetchOne(PlayerRef p, String key, StatsProvider provider) {
         try {
             String uuid = (p.uuid != null && !p.uuid.isEmpty()) ? p.uuid : MojangResolver.uuidFor(p.name);
@@ -114,7 +123,7 @@ public final class StatsService {
                     s = BwStats.nick(p.name);
                 }
             }
-            results.put(key, s);
+            results.put(key, applyFlag(s));
         } catch (StatsException e) {
             results.put(key, BwStats.error(p.name, p.uuid, e.getMessage()));
         } finally {

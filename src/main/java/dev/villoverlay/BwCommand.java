@@ -23,7 +23,7 @@ public final class BwCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/vill <key|proxykey|provider|refresh|ai|toggle|hud|status|tag|untag|note|tags|denick|alert|seen>";
+        return "/vill <key|proxykey|provider|refresh|ai|toggle|hud|status|tag|untag|note|tags|denick|blacklist|alert|seen>";
     }
 
     @Override
@@ -97,6 +97,8 @@ public final class BwCommand extends CommandBase {
                     + " §7| proxy key " + (BwConfig.proxyKey.isEmpty() ? "§8-" : "§aset"));
             msg(sender, "§7refresh §f" + BwConfig.refreshSeconds + "s §7| roster §f" + StatsService.get().rosterSize()
                     + " §7| active §f" + GameDetector.active(Minecraft.getMinecraft()));
+            msg(sender, "§7denick " + (BwConfig.denickEnabled ? "§aon" : "§coff")
+                    + " §7| blacklist " + (BwConfig.blacklistEnabled ? "§aon" : "§coff"));
         } else if (sub.equals("tag")) {
             if (args.length < 3) {
                 msg(sender, "§cusage: /vill tag <player> <label> §8(sniper/cheater/blacklist/friend/...)");
@@ -150,6 +152,27 @@ public final class BwCommand extends CommandBase {
                 msg(sender, "§adenick key saved.");
             } else {
                 msg(sender, "§8usage: /vill denick <on|off|url <template>|key <key>>");
+            }
+        } else if (sub.equals("blacklist") || sub.equals("bl")) {
+            if (args.length < 2) {
+                msg(sender, "§7blacklist " + (BwConfig.blacklistEnabled ? "§aon" : "§coff")
+                        + " §7| url §f" + BwConfig.blacklistUrl);
+                msg(sender, "§8usage: /vill blacklist <on|off|url <template>|key <key>>");
+                return;
+            }
+            String b = args[1].toLowerCase();
+            if (b.equals("on") || b.equals("off")) {
+                BwConfig.setBool("blacklistEnabled", b.equals("on"));
+                StatsService.get().forceRefresh();
+                msg(sender, "§7blacklist " + (BwConfig.blacklistEnabled ? "§aon" : "§coff"));
+            } else if (b.equals("url") && args.length >= 3) {
+                BwConfig.setString("blacklistUrl", join(args, 2));
+                msg(sender, "§ablacklist url set.");
+            } else if (b.equals("key") && args.length >= 3) {
+                BwConfig.setString("blacklistKey", args[2]);
+                msg(sender, "§ablacklist key saved.");
+            } else {
+                msg(sender, "§8usage: /vill blacklist <on|off|url <template>|key <key>>");
             }
         } else if (sub.equals("alert")) {
             if (args.length < 2) {

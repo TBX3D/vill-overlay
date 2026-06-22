@@ -15,10 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *  - a coloured banner line list the HUD draws above the table, and
  *  - a one-shot sound the first time a new "scary" player shows up this game.
  *
- * A player trips an alert when they're on a danger tag (sniper/cheater/...),
- * when nicked (optional), or when they pass the star/FKDR/winstreak thresholds
- * in {@link BwConfig}. Recomputed each client tick; sound fires at most once per
- * player per game. All main-thread.
+ * A player trips an alert when they're on the shared blacklist, on a danger tag
+ * (sniper/cheater/...), when nicked (optional), or when they pass the
+ * star/FKDR/winstreak thresholds in {@link BwConfig}. Recomputed each client
+ * tick; sound fires at most once per player per game. All main-thread.
  */
 public final class ThreatAlert {
 
@@ -65,6 +65,9 @@ public final class ThreatAlert {
 
     /** A short reason string if this player should alert, else null. */
     private String reasonFor(BwStats s) {
+        if (s.flagged) {
+            return s.flagLabel != null ? s.flagLabel.toUpperCase() : "BLACKLISTED";
+        }
         PlayerTags.Tag tag = PlayerTags.get(s.name);
         if (tag != null && BwConfig.alertOnTagged && PlayerTags.isDanger(tag.label)) {
             return tag.label.toUpperCase();

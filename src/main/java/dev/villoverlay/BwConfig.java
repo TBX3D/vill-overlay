@@ -57,6 +57,13 @@ public final class BwConfig {
     /** Denick service key. Falls back to proxyKey when blank. */
     public static String denickKey = "";
 
+    // --- shared blacklist (community cheater/sniper db; off by default) ---
+    public static boolean blacklistEnabled = false;
+    /** URL template; {key} and {uuid} are substituted. Default = Urchin's player route. */
+    public static String blacklistUrl = "https://urchin.ws/player/{uuid}?key={key}&sources=GAME,CHAT";
+    /** Blacklist service key. Falls back to proxyKey when blank. */
+    public static String blacklistKey = "";
+
     // --- threat alerts (banner + one-shot sound for scary players) ---
     public static boolean alertEnabled = true;
     public static boolean alertSound = true;
@@ -122,6 +129,18 @@ public final class BwConfig {
                         + "service. Parsing accepts {player:{uuid,ign}} or top-level {uuid,ign}.");
         denickKey = config.getString("denickKey", CAT, "",
                 "Key for the denick service. Falls back to proxyKey when blank.");
+
+        blacklistEnabled = config.getBoolean("blacklistEnabled", CAT, false,
+                "Flag known cheaters/snipers from a shared community blacklist via blacklistUrl. "
+                        + "Off by default; requires a third-party blacklist service.");
+        blacklistUrl = config.getString("blacklistUrl", CAT, blacklistUrl,
+                "Blacklist URL template. {key} and {uuid} are substituted. The default points at "
+                        + "Urchin (urchin.ws), whose response is {uuid, tags:[{type,reason}], ...} - a "
+                        + "non-empty tags array means flagged. Parsing also accepts a top-level type "
+                        + "string or a true flagged/cheater/sniper boolean.");
+        blacklistKey = config.getString("blacklistKey", CAT, "",
+                "Key for the blacklist service (e.g. an Urchin key from their Discord). "
+                        + "Falls back to proxyKey when blank.");
 
         alertEnabled = config.getBoolean("alertEnabled", CAT, true,
                 "Master switch for threat alerts (the HUD banner + alert sound).");

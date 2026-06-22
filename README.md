@@ -3,8 +3,9 @@
 A Hypixel Bed Wars stats overlay for Minecraft 1.8.9 (Forge). It reads the
 players in your current Bed Wars lobby, looks up each one's stats, and draws a
 compact HUD that ranks them and flags the dangerous ones. It also shows
-generator timers, raises threat alerts, keeps a local blacklist with notes, and
-can write short commentary on the lobby.
+generator timers, raises threat alerts, checks players against a shared
+cheater/sniper blacklist, keeps your own local tags with notes, and can write
+short commentary on the lobby.
 
 It only does anything while you are in a Bed Wars game (Hypixel, with a
 `BED WARS` sidebar). It reads the lobby passively from the tab list and never
@@ -23,6 +24,10 @@ seconds per player, so you stay well under any API limit.
 - **Player tags and notes**: a local blacklist. Tag people as `sniper`,
   `cheater`, `friend` and so on, and attach notes. Danger tags raise an alert
   the next time you see that player.
+- **Shared cheater/sniper blacklist**: optionally check every player against a
+  community blacklist (Urchin by default) and flag known cheaters and snipers
+  with a `☠`, sort them to the top, and raise an alert. Off by default; bring
+  your own service and key.
 - **Session history**: a local "seen this player xN before" counter.
 - **Optional denicking**: resolve nicked players to a real account through a
   configurable third-party endpoint. Off by default; bring your own service.
@@ -39,11 +44,24 @@ The lookup source is pluggable:
   key. Get a free key at <https://developer.hypixel.net>, then set it in-game.
 - **`proxy`**: any third-party service that returns Hypixel player-format JSON
   (`{success, player}`). You set the URL template in the config (`{key}` and
-  `{uuid}` are substituted), so no endpoint is hard-coded. Point it at whatever
-  service you use.
+  `{uuid}` are substituted), so no endpoint is forced. There is an unverified
+  Antisniper default you are meant to replace with whatever service you use.
 
 No API keys ship with this mod. You supply your own, and they live in your local
 config file in plain text, so keep that file private.
+
+## Shared blacklist
+
+On top of your own tags, the overlay can check each player's UUID against a
+shared community cheater/sniper blacklist. It is off by default. Turn it on with
+`/vill blacklist on` and set a key with `/vill blacklist key <key>`. Flagged
+players get a `☠`, sort to the top, and trip a threat alert.
+
+The lookup URL is a template, same as the stats `proxy`: `{key}` and `{uuid}`
+are substituted, so it is not tied to one service. The default points at
+[Urchin](https://urchin.ws) (response `{uuid, tags: [...]}`, flagged when `tags`
+is non-empty); parsing also accepts a top-level `type` string or a true
+`flagged`/`cheater`/`sniper` boolean. Point it at whatever blacklist you use.
 
 ## Build and install
 
@@ -82,6 +100,7 @@ All under `/vill` (aliases `/bw` and `/villoverlay`):
 | `/vill tags` | list everyone you have tagged |
 | `/vill alert ...` | tune the threat-alert thresholds |
 | `/vill denick <on\|off\|url ...\|key ...>` | configure optional denicking |
+| `/vill blacklist <on\|off\|url ...\|key ...>` | configure the shared cheater/sniper blacklist |
 | `/vill seen <player>` | how often you have seen them before |
 
 ## Keybinds

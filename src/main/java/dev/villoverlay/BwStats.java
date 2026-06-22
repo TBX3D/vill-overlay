@@ -38,10 +38,16 @@ public final class BwStats {
     /** Real ign behind a nick, when {@link #denicked}; otherwise null. */
     public final String realName;
 
+    /** True when {@link Blacklist} flagged this uuid as a known cheater/sniper. */
+    public final boolean flagged;
+    /** Blacklist tag category (e.g. "cheater"), when {@link #flagged}; else null. */
+    public final String flagLabel;
+
     private BwStats(String name, String uuid, boolean loading, boolean nicked, String error,
                     int star, double fkdr, double wlr, double kdr, double bblr,
                     int finalKills, int finalDeaths, int wins, int losses, int bedsBroken,
-                    int winstreak, boolean winstreakKnown, boolean denicked, String realName) {
+                    int winstreak, boolean winstreakKnown, boolean denicked, String realName,
+                    boolean flagged, String flagLabel) {
         this.name = name;
         this.uuid = uuid;
         this.loading = loading;
@@ -59,22 +65,27 @@ public final class BwStats {
         this.bedsBroken = bedsBroken;
         this.winstreak = winstreak;
         this.winstreakKnown = winstreakKnown;
-        this.threat = threatOf(nicked, error != null, star, fkdr);
-        this.index = (error != null || loading) ? -1 : star * (fkdr * fkdr);
+        // A blacklist hit is always treated as the top threat tier and sorted above
+        // everyone, so a flagged player can't hide behind low stats.
+        this.threat = flagged ? 4 : threatOf(nicked, error != null, star, fkdr);
+        double base = (error != null || loading) ? -1 : star * (fkdr * fkdr);
+        this.index = flagged ? 1e12 + Math.max(base, 0) : base;
         this.denicked = denicked;
         this.realName = realName;
+        this.flagged = flagged;
+        this.flagLabel = flagLabel;
     }
 
     public static BwStats loading(String name, String uuid) {
-        return new BwStats(name, uuid, true, false, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, false, false, null);
+        return new BwStats(name, uuid, true, false, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, false, false, null, false, null);
     }
 
     public static BwStats nick(String name) {
-        return new BwStats(name, null, false, true, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, false, false, null);
+        return new BwStats(name, null, false, true, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, false, false, null, false, null);
     }
 
     public static BwStats error(String name, String uuid, String msg) {
-        return new BwStats(name, uuid, false, false, msg, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, false, false, null);
+        return new BwStats(name, uuid, false, false, msg, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, false, false, null, false, null);
     }
 
     public static BwStats of(String name, String uuid, int star,
@@ -83,13 +94,21 @@ public final class BwStats {
                              int winstreak, boolean winstreakKnown) {
         return new BwStats(name, uuid, false, false, null, star,
                 div(finalKills, finalDeaths), div(wins, losses), div(kills, deaths), div(bedsBroken, bedsLost),
-                finalKills, finalDeaths, wins, losses, bedsBroken, winstreak, winstreakKnown, false, null);
+                finalKills, finalDeaths, wins, losses, bedsBroken, winstreak, winstreakKnown, false, null, false, null);
     }
 
     /** This same stat line, re-flagged as a denicked player with their real ign. */
     public BwStats asDenicked(String realName) {
         return new BwStats(name, uuid, loading, nicked, error, star, fkdr, wlr, kdr, bblr,
-                finalKills, finalDeaths, wins, losses, bedsBroken, winstreak, winstreakKnown, true, realName);
+                finalKills, finalDeaths, wins, losses, bedsBroken, winstreak, winstreakKnown, true, realName,
+                flagged, flagLabel);
+    }
+
+    /** This same stat line, marked as a community-blacklisted cheater/sniper. */
+    public BwStats withFlag(String label) {
+        return new BwStats(name, uuid, loading, nicked, error, star, fkdr, wlr, kdr, bblr,
+                finalKills, finalDeaths, wins, losses, bedsBroken, winstreak, winstreakKnown, denicked, realName,
+                true, label);
     }
 
     /** prism-style ratio: x/y, but x when y == 0 (avoids div-by-zero, treats as "all"). */
@@ -122,6 +141,9 @@ public final class BwStats {
 
     /** §-colour for this player's threat tier. */
     public String color() {
+        if (flagged) {
+            return "§4";
+        }
         if (loading) {
             return "§7";
         }

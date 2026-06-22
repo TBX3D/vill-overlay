@@ -106,13 +106,13 @@ public final class OverlayHud {
     }
 
     /**
-     * Name column: an optional coloured tag bullet, the real ign for denicked
-     * players (with a §d* marker), and an "xN" count for players seen before.
-     * The name itself takes the Bed Wars team colour when the player is on a
-     * team, so teams read at a glance; otherwise it falls back to a manual tag
-     * colour, then the threat (sweat) tier colour - which keeps carrying the
-     * sweat signal on the stat columns. The truncation budget shrinks as markers
-     * are added so the cell stays in column.
+     * Name column: a §4☠ for a blacklisted player, an optional coloured tag
+     * bullet, the real ign for denicked players (with a §d* marker), and an "xN"
+     * count for players seen before. The name itself takes the Bed Wars team
+     * colour when the player is on a team, so teams read at a glance; otherwise
+     * it falls back to a manual tag colour, then the threat (sweat) tier colour -
+     * which keeps carrying the sweat signal on the stat columns. The truncation
+     * budget shrinks as markers are added so the cell stays in column.
      */
     private static String nameCell(BwStats s, String threatColor, String teamColor) {
         PlayerTags.Tag tag = PlayerTags.get(s.name);
@@ -121,6 +121,10 @@ public final class OverlayHud {
 
         int budget = 12;
         StringBuilder sb = new StringBuilder();
+        if (s.flagged) {
+            sb.append("§4☠ ");
+            budget -= 2;
+        }
         if (tag != null) {
             sb.append(tag.color).append("● ");
             budget -= 2;
