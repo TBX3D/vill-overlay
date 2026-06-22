@@ -49,10 +49,13 @@ public final class Commentary {
             }
             counted++;
             sumFkdr += s.fkdr;
-            if (top == null || s.index > top.index) {
+            // A flagged player is always the headline threat and never the "easiest",
+            // regardless of their stats.
+            if (top == null || (s.flagged && !top.flagged)
+                    || (s.flagged == top.flagged && s.index > top.index)) {
                 top = s;
             }
-            if (easy == null || s.index < easy.index) {
+            if (!s.flagged && (easy == null || s.index < easy.index)) {
                 easy = s;
             }
             if (s.threat >= 3) {

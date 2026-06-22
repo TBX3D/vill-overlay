@@ -65,11 +65,11 @@ public final class BwStats {
         this.bedsBroken = bedsBroken;
         this.winstreak = winstreak;
         this.winstreakKnown = winstreakKnown;
-        // A blacklist hit is always treated as the top threat tier and sorted above
-        // everyone, so a flagged player can't hide behind low stats.
+        // A blacklist hit is always the top threat tier; the sort and commentary
+        // float flagged players above everyone on the flag itself (see
+        // StatsService / Commentary), so a cheater can't hide behind low stats.
         this.threat = flagged ? 4 : threatOf(nicked, error != null, star, fkdr);
-        double base = (error != null || loading) ? -1 : star * (fkdr * fkdr);
-        this.index = flagged ? 1e12 + Math.max(base, 0) : base;
+        this.index = (error != null || loading) ? -1 : star * (fkdr * fkdr);
         this.denicked = denicked;
         this.realName = realName;
         this.flagged = flagged;

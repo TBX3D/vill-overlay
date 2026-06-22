@@ -50,8 +50,11 @@ public final class Blacklist {
             return cached == MISS ? null : cached;
         }
         Result r = query(template, uuid);
-        CACHE.put(uuid, r == null ? MISS : r);
-        return r;
+        if (r == null) {
+            return null; // transient failure: don't cache, retry on a later pass
+        }
+        CACHE.put(uuid, r);
+        return r == MISS ? null : r;
     }
 
     private static Result query(String template, String uuid) {
@@ -71,14 +74,18 @@ public final class Blacklist {
             conn.setReadTimeout(15000);
 
             int code = conn.getResponseCode();
+            if (code == 429 || code >= 500) {
+                return null; // transient: rate-limited or server error, retry later
+            }
             JsonObject root = HypixelProvider.readJson(conn, code);
             if (root == null) {
                 return null;
             }
             if (root.has("success") && !root.get("success").getAsBoolean()) {
-                return null;
+                return null; // service error (e.g. bad key); retry rather than cache a miss
             }
-            return parse(root);
+            Result hit = parse(root);
+            return hit != null ? hit : MISS;
         } catch (Exception e) {
             return null;
         } finally {
@@ -102,11 +109,11 @@ public final class Blacklist {
             }
             String label = null;
             if (tags.get(0).isJsonObject()) {
-                label = str(tags.get(0).getAsJsonObject(), "type");
+                label = clean(str(tags.get(0).getAsJsonObject(), "type"));
             }
             return new Result(label != null ? label : "flagged");
         }
-        String type = str(root, "type");
+        String type = clean(str(root, "type"));
         if (type != null) {
             return new Result(type);
         }
@@ -115,6 +122,30 @@ public final class Blacklist {
             return new Result(label);
         }
         return null;
+    }
+
+    /**
+     * The label is third-party text rendered into chat/HUD and the AI prompt, so
+     * drop Minecraft formatting codes (a section sign plus its following code
+     * char) and control chars, and cap the length.
+     */
+    private static String clean(String s) {
+        if (s == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length() && sb.length() < 24; i++) {
+            char c = s.charAt(i);
+            if (c == '§') {
+                i++; // skip the section sign and the format code that follows it
+                continue;
+            }
+            if (c < ' ') {
+                continue;
+            }
+            sb.append(c);
+        }
+        return sb.length() == 0 ? null : sb.toString();
     }
 
     private static boolean boolTrue(JsonObject o, String field) {

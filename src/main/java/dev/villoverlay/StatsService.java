@@ -145,6 +145,9 @@ public final class StatsService {
         Collections.sort(list, new Comparator<BwStats>() {
             @Override
             public int compare(BwStats a, BwStats b) {
+                if (a.flagged != b.flagged) {
+                    return a.flagged ? -1 : 1; // blacklisted players first, always
+                }
                 return Double.compare(b.index, a.index);
             }
         });
