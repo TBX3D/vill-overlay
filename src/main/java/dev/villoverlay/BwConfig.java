@@ -33,6 +33,7 @@ public final class BwConfig {
 
     // --- timing ---
     public static int refreshSeconds = 30;
+    public static int cacheMinutes = 15;
 
     // --- hud ---
     public static int hudX = 2;
@@ -104,6 +105,9 @@ public final class BwConfig {
                 "API key for the proxy provider (e.g. an Antisniper key from their Discord).");
         refreshSeconds = config.getInt("refreshSeconds", CAT, 30, 10, 600,
                 "Minimum seconds between stat refreshes per player. Keeps you well under API limits.");
+        cacheMinutes = config.getInt("cacheMinutes", CAT, 15, 0, 240,
+                "Minutes to keep a player's stats after they leave your lobby, so re-encountering "
+                        + "them in a later game shows instantly and refetches less. 0 = drop on leave.");
         hudX = config.getInt("hudX", CAT, 2, 0, 10000, "HUD top-left X (before scaling).");
         hudY = config.getInt("hudY", CAT, 2, 0, 10000, "HUD top-left Y (before scaling).");
         hudScalePct = config.getInt("hudScalePct", CAT, 100, 30, 300, "HUD scale, percent.");

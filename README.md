@@ -10,7 +10,9 @@ short commentary on the lobby.
 It only does anything while you are in a Bed Wars game (Hypixel, with a
 `BED WARS` sidebar). It reads the lobby passively from the tab list and never
 auto-types commands like `/who`. Lookups are throttled to at most once every 30
-seconds per player, so you stay well under any API limit.
+seconds per player, so you stay well under any API limit. Recently-seen players
+stay cached for a few minutes, so meeting them again in a later game shows
+instantly instead of loading from scratch.
 
 ## Features
 

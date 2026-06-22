@@ -96,6 +96,7 @@ public final class BwCommand extends CommandBase {
                     + " §7| hypixel key " + (BwConfig.hypixelKey.isEmpty() ? "§cmissing" : "§aset")
                     + " §7| proxy key " + (BwConfig.proxyKey.isEmpty() ? "§8-" : "§aset"));
             msg(sender, "§7refresh §f" + BwConfig.refreshSeconds + "s §7| roster §f" + StatsService.get().rosterSize()
+                    + " §7| cache §f" + StatsService.get().cachedCount()
                     + " §7| active §f" + GameDetector.active(Minecraft.getMinecraft()));
             msg(sender, "§7denick " + (BwConfig.denickEnabled ? "§aon" : "§coff")
                     + " §7| blacklist " + (BwConfig.blacklistEnabled ? "§aon" : "§coff"));

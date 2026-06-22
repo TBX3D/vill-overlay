@@ -44,6 +44,26 @@ public final class StatsService {
         return roster.size();
     }
 
+    /** Players currently held in the stat cache (current roster plus retained absentees). */
+    public int cachedCount() {
+        return results.size();
+    }
+
+    /**
+     * Whether to retain a cached stat line. Players in the current roster are
+     * always kept; one who has left is kept until their last fetch is older than
+     * the cache window, so re-encountering them shows instantly and skips a
+     * refetch. A zero window restores drop-on-leave. This bounds the maps to the
+     * current roster plus whoever was fetched within the window, not the whole
+     * session.
+     */
+    static boolean keepCached(boolean inRoster, Long lastFetch, long now, long cacheMs) {
+        if (inRoster) {
+            return true;
+        }
+        return lastFetch != null && now - lastFetch <= cacheMs;
+    }
+
     /** Force the next tick to re-fetch everyone. */
     public void forceRefresh() {
         lastPass = 0L;
@@ -63,13 +83,16 @@ public final class StatsService {
 
         final List<PlayerRef> snapshot = roster;
 
-        // Drop cached results for players who left.
+        // Keep recently-seen players cached across games instead of dropping
+        // everyone who left the lobby; entries fall out once they have been gone
+        // longer than the cache window.
         Set<String> present = new java.util.HashSet<String>();
         for (PlayerRef p : snapshot) {
             present.add(p.name.toLowerCase());
         }
+        long cacheMs = Math.max(0, BwConfig.cacheMinutes) * 60000L;
         for (String key : new ArrayList<String>(results.keySet())) {
-            if (!present.contains(key)) {
+            if (!keepCached(present.contains(key), lastFetch.get(key), now, cacheMs)) {
                 results.remove(key);
                 lastFetch.remove(key);
             }
