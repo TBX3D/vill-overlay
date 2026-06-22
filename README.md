@@ -63,16 +63,24 @@ are substituted, so it is not tied to one service. The default points at
 is non-empty); parsing also accepts a top-level `type` string or a true
 `flagged`/`cheater`/`sniper` boolean. Point it at whatever blacklist you use.
 
-## Build and install
+## Install
 
-You need a JDK to run Gradle (Java 17 or newer works; the Java 8 toolchain that
-compiles the mod is fetched automatically). Then:
+Grab the latest `villoverlay-*.jar` from the
+[Releases](https://github.com/TBX3D/vill-overlay/releases) page and drop it into
+your 1.8.9 Forge `mods` folder. That is the whole install.
+
+## Build from source
+
+You need a JDK to run Gradle: Java 17 or 21 work, but newer JDKs (24+) are
+rejected by the 1.8.9 Forge/loom plugin. The Java 8 toolchain that compiles the
+mod is fetched automatically. Then:
 
 ```
 ./gradlew build
 ```
 
-Drop `build/libs/villoverlay-1.0.0.jar` into your 1.8.9 Forge `mods` folder.
+The jar lands in `build/libs/villoverlay-<version>.jar`. CI builds this on every
+push and attaches it to a GitHub Release on each `v*` tag.
 
 ## First-time setup
 
