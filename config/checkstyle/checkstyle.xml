@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- A lean ruleset tuned to the existing style: catches imports, brace, whitespace
+     and a handful of real-bug checks, without imposing a reformat. -->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="charset" value="UTF-8"/>
+
+    <module name="LineLength">
+        <property name="max" value="140"/>
+        <property name="ignorePattern" value="^\s*\*.*https?://"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- imports -->
+        <module name="AvoidStarImport"/>
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+
+        <!-- braces -->
+        <module name="NeedBraces"/>
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
+
+        <!-- whitespace -->
+        <module name="WhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+
+        <!-- real-bug checks -->
+        <module name="OneStatementPerLine"/>
+        <module name="EmptyStatement"/>
+        <module name="FallThrough"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="EqualsHashCode"/>
+        <module name="StringLiteralEquality"/>
+
+        <!-- style hygiene -->
+        <module name="ModifierOrder"/>
+        <module name="UpperEll"/>
+        <module name="ArrayTypeStyle"/>
+        <module name="OneTopLevelClass"/>
+    </module>
+</module>

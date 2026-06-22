@@ -3,9 +3,24 @@ import org.apache.commons.lang3.SystemUtils
 plugins {
     idea
     java
+    checkstyle
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+checkstyle {
+    toolVersion = "10.12.4"
+    isIgnoreFailures = false
+    maxWarnings = 0
+}
+
+// The mod compiles on the Java 8 toolchain, but Checkstyle 10 needs Java 11+, so
+// run the analysis on a 17+ launcher (Gradle itself already runs on one).
+tasks.withType(Checkstyle::class).configureEach {
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    })
 }
 
 // Constants:
