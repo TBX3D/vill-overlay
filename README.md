@@ -102,6 +102,7 @@ All under `/vill` (aliases `/bw` and `/villoverlay`):
 | `/vill refresh` | force a stats refresh now |
 | `/vill toggle` | turn the overlay on or off |
 | `/vill hud <x> <y>` | move the HUD |
+| `/vill sort <field>` | sort the table by `index`, `star`, `fkdr`, `wlr`, `bblr`, `finals`, `wins` or `ws` |
 | `/vill ai` | run AI commentary on the current lobby |
 | `/vill status` | show provider, key and roster state |
 | `/vill tag <player> <label>` | tag a player (`sniper`, `cheater`, `friend`, ...) |

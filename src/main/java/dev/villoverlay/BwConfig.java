@@ -40,6 +40,7 @@ public final class BwConfig {
     public static int hudY = 2;
     public static int hudScalePct = 100;
     public static int maxRows = 16;
+    public static String sortBy = "index";
     public static boolean showGenTimers = true;
     public static boolean showCommentary = true;
 
@@ -112,6 +113,9 @@ public final class BwConfig {
         hudY = config.getInt("hudY", CAT, 2, 0, 10000, "HUD top-left Y (before scaling).");
         hudScalePct = config.getInt("hudScalePct", CAT, 100, 30, 300, "HUD scale, percent.");
         maxRows = config.getInt("maxRows", CAT, 16, 1, 16, "Max player rows to draw.");
+        sortBy = config.getString("sortBy", CAT, "index",
+                "HUD sort key: index (threat, default), star, fkdr, wlr, bblr, finals, wins, ws. "
+                        + "Blacklisted players always sort first regardless.");
         showGenTimers = config.getBoolean("showGenTimers", CAT, true, "Draw diamond/emerald gen timers.");
         showCommentary = config.getBoolean("showCommentary", CAT, true, "Draw the heuristic commentary line.");
         diamondGenSeconds = config.getInt("diamondGenSeconds", CAT, 30, 1, 600,

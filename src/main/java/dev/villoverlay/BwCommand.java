@@ -23,7 +23,7 @@ public final class BwCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/vill <key|proxykey|provider|refresh|ai|toggle|hud|status|tag|untag|note|tags|denick|blacklist|alert|seen>";
+        return "/vill <key|proxykey|provider|refresh|ai|toggle|hud|sort|status|tag|untag|note|tags|denick|blacklist|alert|seen>";
     }
 
     @Override
@@ -91,12 +91,26 @@ public final class BwCommand extends CommandBase {
             } else {
                 msg(sender, "§7hud at §f" + BwConfig.hudX + "," + BwConfig.hudY + " §8(usage: /vill hud <x> <y>)");
             }
+        } else if (sub.equals("sort")) {
+            String fields = String.join(", ", StatsService.SORT_FIELDS);
+            if (args.length < 2) {
+                msg(sender, "§7sort = §f" + BwConfig.sortBy + " §8(" + fields + ")");
+                return;
+            }
+            String f = args[1].toLowerCase();
+            if (!StatsService.SORT_FIELDS.contains(f)) {
+                msg(sender, "§csort must be one of: §f" + fields);
+                return;
+            }
+            BwConfig.setString("sortBy", f);
+            msg(sender, "§asort = §f" + f);
         } else if (sub.equals("status")) {
             msg(sender, "§7provider §f" + BwConfig.provider
                     + " §7| hypixel key " + (BwConfig.hypixelKey.isEmpty() ? "§cmissing" : "§aset")
                     + " §7| proxy key " + (BwConfig.proxyKey.isEmpty() ? "§8-" : "§aset"));
             msg(sender, "§7refresh §f" + BwConfig.refreshSeconds + "s §7| roster §f" + StatsService.get().rosterSize()
                     + " §7| cache §f" + StatsService.get().cachedCount()
+                    + " §7| sort §f" + BwConfig.sortBy
                     + " §7| active §f" + GameDetector.active(Minecraft.getMinecraft()));
             msg(sender, "§7denick " + (BwConfig.denickEnabled ? "§aon" : "§coff")
                     + " §7| blacklist " + (BwConfig.blacklistEnabled ? "§aon" : "§coff"));

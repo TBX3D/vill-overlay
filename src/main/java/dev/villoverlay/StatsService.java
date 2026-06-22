@@ -165,16 +165,54 @@ public final class StatsService {
             BwStats s = results.get(p.name.toLowerCase());
             list.add(s != null ? s : BwStats.loading(p.name, p.uuid));
         }
+        final String field = BwConfig.sortBy;
         Collections.sort(list, new Comparator<BwStats>() {
             @Override
             public int compare(BwStats a, BwStats b) {
-                if (a.flagged != b.flagged) {
-                    return a.flagged ? -1 : 1; // blacklisted players first, always
-                }
-                return Double.compare(b.index, a.index);
+                return compareFor(a, b, field);
             }
         });
         return list;
+    }
+
+    /** Sort keys offered to {@code /vill sort}; also the source of truth for validation. */
+    public static final Set<String> SORT_FIELDS = Collections.unmodifiableSet(new java.util.LinkedHashSet<String>(
+            java.util.Arrays.asList("index", "star", "fkdr", "wlr", "bblr", "finals", "wins", "ws")));
+
+    /**
+     * Roster order for the HUD: blacklisted players always come first, then by the
+     * chosen field, highest first. An unknown field falls back to the threat index.
+     */
+    static int compareFor(BwStats a, BwStats b, String field) {
+        if (a.flagged != b.flagged) {
+            return a.flagged ? -1 : 1; // blacklisted players first, always
+        }
+        return Double.compare(sortValue(b, field), sortValue(a, field));
+    }
+
+    static double sortValue(BwStats s, String field) {
+        if ("star".equals(field)) {
+            return s.star;
+        }
+        if ("fkdr".equals(field)) {
+            return s.fkdr;
+        }
+        if ("wlr".equals(field)) {
+            return s.wlr;
+        }
+        if ("bblr".equals(field)) {
+            return s.bblr;
+        }
+        if ("finals".equals(field)) {
+            return s.finalKills;
+        }
+        if ("wins".equals(field)) {
+            return s.wins;
+        }
+        if ("ws".equals(field)) {
+            return s.winstreakKnown ? s.winstreak : -1;
+        }
+        return s.index;
     }
 
     public String commentary() {
