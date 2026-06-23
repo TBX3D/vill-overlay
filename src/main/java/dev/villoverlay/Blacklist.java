@@ -97,8 +97,8 @@ public final class Blacklist {
 
     /**
      * Tolerant flag extraction. Primary shape is Urchin's {@code tags} array
-     * (flagged when non-empty, label from the first tag's {@code type}); also
-     * accepts a top-level {@code type} string or a true {@code flagged}/
+     * (flagged when non-empty, label from the most severe tag's {@code type});
+     * also accepts a top-level {@code type} string or a true {@code flagged}/
      * {@code cheater}/{@code sniper} boolean.
      */
     private static Result parse(JsonObject root) {
@@ -107,10 +107,7 @@ public final class Blacklist {
             if (tags.size() == 0) {
                 return null;
             }
-            String label = null;
-            if (tags.get(0).isJsonObject()) {
-                label = clean(str(tags.get(0).getAsJsonObject(), "type"));
-            }
+            String label = severestTag(tags);
             return new Result(label != null ? label : "flagged");
         }
         String type = clean(str(root, "type"));
@@ -122,6 +119,42 @@ public final class Blacklist {
             return new Result(label);
         }
         return null;
+    }
+
+    /**
+     * The most severe tag's category: a cheater-class tag outranks a sniper,
+     * which outranks anything else. Players carry several tags in no fixed
+     * order, so surface the worst rather than whichever happens to be first.
+     */
+    private static String severestTag(JsonArray tags) {
+        String best = null;
+        int bestRank = -1;
+        for (int i = 0; i < tags.size(); i++) {
+            if (!tags.get(i).isJsonObject()) {
+                continue;
+            }
+            String type = clean(str(tags.get(i).getAsJsonObject(), "type"));
+            if (type == null) {
+                continue;
+            }
+            int rank = rankOf(type);
+            if (rank > bestRank) {
+                bestRank = rank;
+                best = type;
+            }
+        }
+        return best;
+    }
+
+    private static int rankOf(String type) {
+        String t = type.toLowerCase();
+        if (t.contains("cheat")) {
+            return 2;
+        }
+        if (t.contains("snip")) {
+            return 1;
+        }
+        return 0;
     }
 
     /**
