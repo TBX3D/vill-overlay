@@ -81,7 +81,7 @@ public final class OverlayHud {
             } else if (s.nicked) {
                 fr.drawStringWithShadow("§dNICK", cStar, ty, 0xFFFFFF);
             } else {
-                fr.drawStringWithShadow(c + s.star, cStar, ty, 0xFFFFFF);
+                fr.drawStringWithShadow(Prestige.format(s.star), cStar, ty, 0xFFFFFF);
                 fr.drawStringWithShadow(c + Commentary.fmt(s.fkdr), cFkdr, ty, 0xFFFFFF);
                 fr.drawStringWithShadow(c + Commentary.fmt(s.wlr), cWlr, ty, 0xFFFFFF);
                 fr.drawStringWithShadow(c + (s.winstreakKnown ? String.valueOf(s.winstreak) : "?"), cWs, ty, 0xFFFFFF);
